@@ -31,8 +31,8 @@ fn main() {
         .about("Multithreaded Directory/File Buster")
         .arg(
             Arg::with_name("dictionary")
-                .short("d")
-                .long("dic")
+                .short("w")
+                .long("wordlist")
                 .help("Dictionary file, items separated by newlines and/or spaces")
                 .takes_value(true)
                 .required(true)
@@ -130,16 +130,22 @@ fn main() {
                 .takes_value(true)
                 .required(false)
             ).arg(
-            Arg::with_name("Basic Auth")
+            Arg::with_name("basic auth")
                 .short("b")
                 .long("basic-auth")
-                .help("Set credentials for HTTP basic authentication in the format username:password")
+                .help("set credentials for http basic authentication in the format username:password")
+                .multiple(false)
+                .takes_value(true)
+                .required(false)
+            ).arg(
+            Arg::with_name("Retry Count")
+                .short("R")
+                .long("retry-count")
+                .help("Set the maximum number of requests for a single target (in case of timeouts, or other errors). Default is 0.")
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
             )
-
-
         .get_matches();
 
     //base url
@@ -183,6 +189,13 @@ fn main() {
         0 => None,
         _ => Some(Duration::from_secs(timeout_input)),
     };
+
+    //retry count
+    let retry_limit: u64 = args
+        .value_of("Retry Count")
+        .unwrap_or("0")
+        .parse()
+        .unwrap_or(0);
 
     //UA
     let client_ua = (args
@@ -311,6 +324,7 @@ fn main() {
         redirect: redir_limit,
         proxy_url: proxy_url,
         proxy_auth: proxy_auth,
+        retry_limit: retry_limit,
     };
 
     //setup headers
