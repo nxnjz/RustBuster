@@ -1,30 +1,33 @@
-mod blib;
+/*      Copyright (C) 2019 A. Karl W.
+This file is part of RustBuster.
+RustBuster is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+RustBuster is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with RustBuster. If not, see <http://www.gnu.org/licenses/>. */
+
+mod rblib;
 
 use base64::encode as b64;
-use blib::*;
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg};
 use indicatif::{ProgressBar, ProgressStyle};
-use reqwest::{header, Client, RedirectPolicy};
-use std::sync::{atomic::AtomicU64, atomic::Ordering, Arc};
+use rblib::*;
+use reqwest::header;
+use std::sync::Arc;
 use std::{fs, thread, time::Duration};
 
-struct Config {
-    verbosity: u64,
-    codes: Vec<usize>,
-    timeout: Option<Duration>,
-    ignore_cert: bool,
-    redirect: usize,
-    proxy_url: Option<String>,
-    proxy_auth: Option<String>,
-}
-
 fn main() {
-    let app_ver = "0.11";
+    let app_ver = "0.12";
     let app_name = "RustBuster";
 
     let args = App::new(app_name)
         .version(app_ver)
-        .author("Karl W. <karl@nxnjz.net>")
+        .author("A. Karl W. <karl@nxnjz.net>")
         .about("Multithreaded Directory/File Buster")
         .arg(
             Arg::with_name("dictionary")
@@ -300,7 +303,7 @@ fn main() {
         start = end;
     }
 
-    let config = Config {
+    let config = rblib::Config {
         verbosity: verbosity,
         codes: codes,
         timeout: timeout,
@@ -327,7 +330,7 @@ fn main() {
     let config = Arc::new(config);
 
     //create shared counter
-    let progress = Arc::new(AtomicU64::new(0));
+    //let progress = Arc::new(AtomicU64::new(0));
     //create bar and put it in Arc
     let bar = ProgressBar::new(urls.len() as u64);
     bar.set_style(
@@ -341,93 +344,16 @@ fn main() {
         let url_map_i = url_map[i as usize].clone();
         //clone pointers
         let config = Arc::clone(&config);
-        let progress = Arc::clone(&progress);
         let headers = Arc::clone(&headers);
         let bar = Arc::clone(&bar);
         //spawn threads
         threads.push(thread::spawn(move || {
-            tjob(i, &url_map_i, &config, &progress, &headers, &bar);
+            tjob(i, &url_map_i, &config, &headers, &bar);
         }));
     }
 
     //wait for threads to finish
     for t in threads {
         let _ = t.join();
-    }
-}
-
-fn tjob(
-    i: usize,
-    urllist: &[String],
-    config: &Config,
-    progress: &AtomicU64,
-    headers: &header::HeaderMap,
-    bar: &ProgressBar,
-) {
-    output(format!("Thread {} started", i), 2, &config.verbosity);
-    //let mut proxy_u = "";
-    //let mut proxy_p = "";
-    let mut proxy_url = String::new();
-    let mut clientbuild = Client::builder();
-    if config.proxy_auth.is_some() {
-        let proxy_auth = config.proxy_auth.clone().unwrap();
-        let proxy_u = proxy_auth.split(':').nth(0).unwrap();
-        let proxy_p = proxy_auth.split(':').nth(1).unwrap();
-        proxy_url = config.proxy_url.clone().unwrap();
-        clientbuild = clientbuild.proxy(
-            reqwest::Proxy::all(&proxy_url)
-                .unwrap()
-                .basic_auth(proxy_u, proxy_p),
-        );
-    } else if config.proxy_url.is_some() {
-        proxy_url = config.proxy_url.clone().unwrap();
-        clientbuild = clientbuild.proxy(reqwest::Proxy::all(&proxy_url).unwrap());
-    }
-
-    let redir_limit = config.redirect.clone();
-    let redir_pol = RedirectPolicy::custom(move |attempt| {
-        if attempt.previous().len() > redir_limit {
-            attempt.stop()
-        } else {
-            attempt.follow()
-        }
-    });
-    let client = clientbuild
-        .timeout(config.timeout)
-        .default_headers(headers.to_owned())
-        .redirect(redir_pol)
-        .danger_accept_invalid_hostnames(config.ignore_cert)
-        .danger_accept_invalid_certs(config.ignore_cert)
-        .build()
-        .expect("[Err 51]Error configuring HTTP client");
-    for url in urllist.iter() {
-        let resp = client
-            .head(url)
-            .send()
-            .expect("[Err 41]Error sending HTTP request");
-        let resp_code: usize = resp
-            .status()
-            .to_string()
-            .split_whitespace()
-            .next()
-            .expect("[Err 31]Error parsing response code")
-            .parse()
-            .expect("[Err 32]Error parsing response code");
-        if config.codes.contains(&resp_code) {
-            bar_output(
-                format!("{} {}", url, resp.status()),
-                1,
-                &config.verbosity,
-                bar,
-            );
-        } else {
-            bar_output(
-                format!("{} {}", url, resp.status()),
-                3,
-                &config.verbosity,
-                bar,
-            );
-        }
-        bar.inc(1);
     }
 }
