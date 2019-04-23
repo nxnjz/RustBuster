@@ -2,6 +2,7 @@
 
 RustBuster is a multithreaded CLI tool for bruteforcing files and/or directories on HTTP(s) servers, similar to GoBuster, DirBuster, and Dirb.
 
+**NOTE** RustBuster is still a newborn, but works well enough in most cases. 
 Features:
 
 * Auto-appends file extensions.
@@ -28,6 +29,53 @@ Build and Install using Cargo:
 The following will add `~/.cargo/bin` to your PATH if it's not already present.
 
 `echo $PATH | grep ~/.cargo/bin || export PATH=$PATH:~/.cargo/bin`
+
+# Usage
+
+#### Bare minimum: 
+
+`rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt`
+
+#### From rustbuster --help:
+
+USAGE:
+    rustbuster [FLAGS] [OPTIONS] --url <Base URL> --wordlist <dictionary>
+
+FLAGS:
+        --unsafe-https    Set this option to ignore invalid hostnames/certificates
+    -v                    Verbosity level: -v or -vv or -vvv. 
+    -h, --help            Prints help information
+    -V, --version         Prints version information
+
+OPTIONS:
+    -u, --url <Base URL>                     Base URL on which items are appended.
+    -w, --wordlist <dictionary>              Dictionary file, items separated by newlines and/or spaces
+    -x, --ext <Extensions>
+            Comma separated list of extensions to use.
+            If the provided value ends with a comma, a blank extension will also be used (no extension).
+            Examples: .html,.php,.txt
+                      .html,.php,.txt,
+                      .php.bak,.php.old,.php,.PHP,.php5,
+    -t, --threads <Threads>
+            Number of threads. Default: 12.
+            Please keep OS limits in mind, setting a high number may cause some threads to crash.
+    -s, --status-codes <Status Codes>
+            Comma separated list of status codes which should be considered success. Dashes can be used to specify
+            ranges.
+             Default: 200-299,301,302,403
+    -c, --cookie <Cookie List>               Optional cookie list in the form of "name=value; name2=value2;
+                                             name3=value3;"
+    -p, --proxy <Proxy>                      Use a proxy for http and https in one of the following formats:
+                                              http(s)://myproxy.net:port
+                                             user:pass@http(s)://myproxy.tld:port
+    -r, --redirect-limit <Redirect Limit>    Set the maximum number of redirects to follow. Default: 0
+    -R, --retry-count <Retry Count>          Set the maximum number of requests for a single target (in case of
+                                             timeouts, or other errors). Default is 0.
+    -T, --timeout <Timeout>...               Total timeout for a request. Default: 30 seconds
+        --user-agent <User Agent>            Custom User Agent
+    -b, --basic-auth <basic auth>            set credentials for http basic authentication in the format
+                                             username:password
+
 
 
 
