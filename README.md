@@ -85,7 +85,13 @@ OPTIONS:
 
 ```
 
+#NOTES
 
+RustBuster started as a way for me to learn rust, expect inconsistencies and inefficiencies in the code. 
+
+Constructive criticism is very welcome. 
+
+Thanks to [reqwest]("https://github.com/seanmonstar/reqwest")
 
 
 
