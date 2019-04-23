@@ -1,6 +1,6 @@
 # RustBuster
 
-RustBuster is a multithreaded CLI tool for bruteforcing files and/or directories on HTTP(s) servers, similar to GoBuster, DirBuster, and Dirb.
+RustBuster is a simple multithreaded CLI tool for bruteforcing files and/or directories on HTTP(s) servers, similar to GoBuster, DirBuster, and Dirb.
 
 **RustBuster is still a newborn, but works well enough in most cases.**
 
@@ -11,7 +11,7 @@ Features:
 * Custom User-Agents, cookies, and basic authorization.
 * Custom timeouts and redirection limits.
 * Proxy support (with and without authentication).
-* Nice Progress Bar
+* Nice Progress Bar!
 
 # Installation
 
@@ -85,7 +85,7 @@ OPTIONS:
 
 ```
 
-#NOTES
+# NOTES
 
 RustBuster started as a way for me to learn rust, expect inconsistencies and inefficiencies in the code. 
 
@@ -94,5 +94,48 @@ Constructive criticism is very welcome.
 Thanks to [reqwest]("https://github.com/seanmonstar/reqwest"), [clap]("https://github.com/clap-rs/clap"), [indicatif]("https://github.com/mitsuhiko/indicatif"), [base64]("https://docs.rs/base64/0.10.1/base64/").
 
 
+# BENCHMARKS
+
+The following are some basic, single-iteration tests comparing RustBuster and GoBuster. All tests were performed on a 1vCPU 1GB Debian 9 VM with a rather stable 1Gbps connection. The wordlist used contained 20469 words. Timeout was set to 60 seconds on both tools. 
+
+## Single thread
+
+CMD: gobuster -w big1.txt -u https://google.com -t 1 -to 60s
+TIME: 0m42.487s
+
+CMD: rustbuster -w big1.txt -u https://google.com -t 1 -T 60
+TIME: 0m35.608s
+
+## 10 threads
+
+CMD: gobuster -w big1.txt -u https://google.com -t 10 -to 60s
+TIME: 0m20.222s
+
+CMD: rustbuster -w big1.txt -u https://google.com -t 10 -T 60
+TIME: 0m5.130s
+
+## 20 threads
+
+CMD: gobuster -w big1.txt -u https://google.com -t 20 -to 60s
+TIME: 0m25.641s
+
+CMD: rustbuster -w big1.txt -u https://google.com -t 20 -T 60
+TIME: 0m4.447s
+
+## 50 threads
+
+CMD: gobuster -w big1.txt -u https://google.com -t 50 -to 60s
+TIME: 0m27.564s
+
+CMD: rustbuster -w big1.txt -u https://google.com -t 50 -T 60
+TIME: 0m3.435s
+
+## 100 threads
+
+CMD: gobuster -w big1.txt -u https://google.com -t 100 -to 60s
+TIME: 0m28.535s
+
+CMD: rustbuster -w big1.txt -u https://google.com -t 100 -T 60
+TIME: 0m5.243s
 
 
