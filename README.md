@@ -19,7 +19,7 @@ Features:
 
 Installing from source requires Cargo. Refer to https://doc.rust-lang.org/cargo/getting-started/installation.html for installing Cargo.
 
-First, clone this gitlab repo:
+First, clone this repo:
 
 `git clone https://gitlab.com/nxnjz/rustbuster.git` 
 
@@ -27,15 +27,20 @@ Build and Install using Cargo:
 
 `cargo install --path rustbuster/`
 
-The following will add `~/.cargo/bin` to your PATH if it's not already present.
-
-`echo $PATH | grep ~/.cargo/bin || export PATH=$PATH:~/.cargo/bin`
-
 # Usage
 
-#### Bare minimum: 
+#### Bare minimum (no file extensions, for bruteforcing directories): 
 
 `rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt`
+
+#### With file extensions:
+
+`rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt -x .html,.php,.txt`
+
+#### With file extensions and blank extension (for bruteforcing directories):
+
+`rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt -x .html,.php,.txt,`
+
 
 #### From rustbuster --help:
 
