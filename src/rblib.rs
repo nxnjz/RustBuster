@@ -57,6 +57,7 @@ pub fn tjob(
     output(format!("Thread {} started", i), 2, &config.verbosity);
     //let mut proxy_u = "";
     //let mut proxy_p = "";
+    #[allow(unused_assignments)]
     let mut proxy_url = String::new();
     let mut clientbuild = Client::builder();
     if config.proxy_auth.is_some() {
