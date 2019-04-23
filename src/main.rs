@@ -19,7 +19,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rblib::*;
 use reqwest::header;
 use std::sync::Arc;
-use std::{fs, thread, time::Duration};
+use std::{fs, fs::File, fs::OpenOptions, path::Path, thread, time::Duration};
 
 fn main() {
     let app_ver = "0.12";
@@ -145,8 +145,35 @@ fn main() {
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
+                //to be implemented
+//            ).arg(
+//            Arg::with_name("Output File")
+//                .short("o")
+//                .long("output-file")
+//                .help("Write results to a file. Only positive results will be saved, regardless of verbosity level.\nIf the file already exits, RustBuster will exit.\nUse -oo to allow overwriting an existing file.")
+//                .multiple(true)
+//                .takes_value(true)
+//                .required(false)
             )
         .get_matches();
+
+    //check output file
+    //let out_filename = args.value_of("Output File");
+    //if out_filename.is_some()
+    //    && Path::new(out_filename.unwrap()).exists()
+    //    && args.occurrences_of("Output File") != 2
+    //{
+    //    panic!("Output File already exists. Use -oo instead of -o if you want it overwritten");
+    //}
+    //let mut outfile: Option<File> = None;
+    //if out_filename.is_some() {
+    //    outfile = Some(
+    //        OpenOptions::new()
+    //            .append(true)
+    //            .open(out_filename.unwrap())
+    //            .expect("Unable to open file for writing"),
+    //    );
+    //}
 
     //base url
     let mut base_url = args.value_of("Base URL").unwrap().to_string();
@@ -162,7 +189,7 @@ fn main() {
         .unwrap_or(12);
 
     //input file
-    let dic_filename = args.value_of("dictionary").unwrap_or("");
+    let dic_filename = args.value_of("dictionary").unwrap(); //unwrap is ok, this arg is required.
     let dic_str = fs::read_to_string(dic_filename)
         .expect(format!("Could not read {}", dic_filename).as_str());
     if dic_str.is_empty() {
@@ -247,13 +274,11 @@ fn main() {
         proxy_url = None;
         proxy_auth = None;
     }
-    println!("{:?}{:?}", proxy_auth, proxy_url);
 
     //basic auth credentials
     let basic_auth = args
         .value_of("Basic Auth")
         .map(|x| "Basic ".to_string() + &b64(x));
-    println!("{:?}", basic_auth);
 
     //status codes
     let stat_codes = args
@@ -325,6 +350,7 @@ fn main() {
         proxy_url: proxy_url,
         proxy_auth: proxy_auth,
         retry_limit: retry_limit,
+        //outfile: outfile,
     };
 
     //setup headers

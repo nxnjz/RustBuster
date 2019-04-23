@@ -13,6 +13,8 @@ along with RustBuster. If not, see <http://www.gnu.org/licenses/>. */
 
 use indicatif::ProgressBar;
 use reqwest::{header, Client, RedirectPolicy};
+use std::fs::File;
+use std::io::Write;
 use std::time::Duration;
 
 pub struct Config {
@@ -24,6 +26,7 @@ pub struct Config {
     pub proxy_url: Option<String>,
     pub proxy_auth: Option<String>,
     pub retry_limit: u64,
+    //pub outfile: Option<File>,
 }
 
 pub fn output<T>(msg: T, msg_level: u64, &verbosity_conf: &u64) -> ()
@@ -124,20 +127,14 @@ pub fn tjob(
             .expect("[Err 31]Error parsing response code")
             .parse()
             .expect("[Err 32]Error parsing response code");
+        let out_msg = format!("{} {}", url, resp.status());
         if config.codes.contains(&resp_code) {
-            bar_output(
-                format!("{} {}", url, resp.status()),
-                1,
-                &config.verbosity,
-                bar,
-            );
+            bar_output(out_msg.clone(), 1, &config.verbosity, bar);
+        //if config.outfile.is_some() {
+        //    writeln!(config.outfile.unwrap(), "{}", out_msg);
+        //}
         } else {
-            bar_output(
-                format!("{} {}", url, resp.status()),
-                3,
-                &config.verbosity,
-                bar,
-            );
+            bar_output(out_msg, 3, &config.verbosity, bar);
         }
         bar.inc(1);
     }
