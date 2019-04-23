@@ -31,15 +31,15 @@ Build and Install using Cargo:
 
 #### Bare minimum (no file extensions, for bruteforcing directories): 
 
-`rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt`
+`rustbuster -u https://yoursite.tld/ -w /usr/share/wordlists/dirb/small.txt`
 
 #### With file extensions:
 
-`rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt -x .html,.php,.txt`
+`rustbuster -u https://yoursite.tld/ -w /usr/share/wordlists/dirb/small.txt -x .html,.php,.txt`
 
 #### With file extensions and blank extension (for bruteforcing directories):
 
-`rustbuster -u https://yoursite.net/ -w /usr/share/wordlists/dirb/small.txt -x .html,.php,.txt,`
+`rustbuster -u https://yoursite.tld/ -w /usr/share/wordlists/dirb/small.txt -x .html,.php,.txt,`
 
 
 #### From rustbuster --help:
