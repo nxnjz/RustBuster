@@ -87,7 +87,7 @@ fn main() {
             Arg::with_name("Timeout")
                 .short("T")
                 .long("timeout")
-                .help("Total timeout for a request. Default: 30 seconds")
+                .help("Total timeout for a request, in seconds. Default: 30 seconds")
                 .multiple(true)
                 .takes_value(true)
                 .required(false),
