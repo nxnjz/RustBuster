@@ -22,7 +22,7 @@ use std::sync::Arc;
 use std::{fs, fs::File, fs::OpenOptions, path::Path, thread, time::Duration};
 
 fn main() {
-    let app_ver = "0.12";
+    let app_ver = "0.1.2";
     let app_name = "RustBuster";
 
     let args = App::new(app_name)
@@ -101,6 +101,7 @@ fn main() {
                 .required(false),
         ).arg(
             Arg::with_name("User Agent")
+                .short("a")
                 .long("user-agent")
                 .help("Custom User Agent")
                 .multiple(false)
@@ -108,8 +109,9 @@ fn main() {
                 .required(false),
         ).arg(
             Arg::with_name("Ignore HTTPS Certificate Errors")
+                .short("U")
                 .long("unsafe-https")
-                .help("Set this option to ignore invalid hostnames/certificates")
+                .help("Set this option to ignore invalid hostnames and certificate errors")
                 .multiple(false)
                 .takes_value(false)
                 .required(false)
@@ -125,7 +127,7 @@ fn main() {
             Arg::with_name("Proxy")
                 .short("p")
                 .long("proxy")
-                .help("Use a proxy for http and https in one of the following formats:\n http(s)://myproxy.net:port\nuser:pass@http(s)://myproxy.tld:port")
+                .help("Use a proxy for http and https in one of the following formats:\nhttp(s)://myproxy.net:port\nuser:pass@http(s)://myproxy.tld:port")
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
@@ -141,7 +143,7 @@ fn main() {
             Arg::with_name("Retry Count")
                 .short("R")
                 .long("retry-count")
-                .help("Set the maximum number of requests for a single target (in case of timeouts, or other errors). Default is 0.")
+                .help("Set the maximum number of tries for a single request (applies in case of timeouts, or other errors). Default is 0.")
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
