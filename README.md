@@ -49,8 +49,8 @@ USAGE:
     rustbuster [FLAGS] [OPTIONS] --url <Base URL> --wordlist <dictionary>
 
 FLAGS:
-        --unsafe-https    Set this option to ignore invalid hostnames/certificates
-    -v                    Verbosity level: -v or -vv or -vvv. 
+    -U, --unsafe-https    Set this option to ignore invalid hostnames and certificate errors
+    -v                    Verbosity level: -v or -vv or -vvv.
     -h, --help            Prints help information
     -V, --version         Prints version information
 
@@ -73,16 +73,15 @@ OPTIONS:
     -c, --cookie <Cookie List>               Optional cookie list in the form of "name=value; name2=value2;
                                              name3=value3;"
     -p, --proxy <Proxy>                      Use a proxy for http and https in one of the following formats:
-                                              http(s)://myproxy.net:port
+                                             http(s)://myproxy.net:port
                                              user:pass@http(s)://myproxy.tld:port
     -r, --redirect-limit <Redirect Limit>    Set the maximum number of redirects to follow. Default: 0
-    -R, --retry-count <Retry Count>          Set the maximum number of requests for a single target (in case of
+    -R, --retry-count <Retry Count>          Set the maximum number of tries for a single request (applies in case of
                                              timeouts, or other errors). Default is 0.
     -T, --timeout <Timeout>...               Total timeout for a request. Default: 30 seconds
-        --user-agent <User Agent>            Custom User Agent
+    -a, --user-agent <User Agent>            Custom User Agent
     -b, --basic-auth <basic auth>            set credentials for http basic authentication in the format
                                              username:password
-
 
 ```
 
