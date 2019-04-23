@@ -38,6 +38,7 @@ The following will add `~/.cargo/bin` to your PATH if it's not already present.
 
 #### From rustbuster --help:
 
+```
 USAGE:
     rustbuster [FLAGS] [OPTIONS] --url <Base URL> --wordlist <dictionary>
 
@@ -77,6 +78,7 @@ OPTIONS:
                                              username:password
 
 
+```
 
 
 
