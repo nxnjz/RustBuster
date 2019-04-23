@@ -25,7 +25,8 @@ Build and Install using Cargo:
 
 `cargo install --path rustbuster/`
 
-The following will add ~/.cargo/bin to your PATH if it's not already present.
+The following will add `~/.cargo/bin` to your PATH if it's not already present.
+
 `echo $PATH | grep ~/.cargo/bin || export PATH=$PATH:~/.cargo/bin`
 
 
