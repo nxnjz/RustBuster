@@ -91,7 +91,7 @@ RustBuster started as a way for me to learn rust, expect inconsistencies and ine
 
 Constructive criticism is very welcome. 
 
-Thanks to [reqwest]("https://github.com/seanmonstar/reqwest")
+Thanks to [reqwest]("https://github.com/seanmonstar/reqwest"), [clap]("https://github.com/clap-rs/clap"), [indicatif]("https://github.com/mitsuhiko/indicatif"), [base64]("https://docs.rs/base64/0.10.1/base64/").
 
 
 
