@@ -54,7 +54,7 @@ pub fn tjob(
     headers: &header::HeaderMap,
     bar: &ProgressBar,
 ) {
-    output(format!("Thread {} started", i), 2, &config.verbosity);
+    bar_output(format!("Thread {} started", i), 3, &config.verbosity, bar);
     //let mut proxy_u = "";
     //let mut proxy_p = "";
     #[allow(unused_assignments)]
@@ -91,8 +91,19 @@ pub fn tjob(
         .danger_accept_invalid_certs(config.ignore_cert)
         .build()
         .expect("[Err 51]Error configuring HTTP client");
+    output(
+        format!("HTTP client from thread {} is ready.", i),
+        3,
+        &config.verbosity,
+    );
     for url in urllist.iter() {
         let mut attempt = 0;
+        bar_output(
+            format!("Thread {} sending request to {}", i, url),
+            3,
+            &config.verbosity,
+            bar,
+        );
         let mut resp = client.head(url).send();
         while resp.is_err() && attempt < config.retry_limit {
             bar_output(
@@ -111,7 +122,7 @@ pub fn tjob(
                     url,
                     attempt + 1
                 ),
-                2,
+                1,
                 &config.verbosity,
                 bar,
             );
@@ -130,12 +141,12 @@ pub fn tjob(
             .expect("[Err 32]Error parsing response code");
         let out_msg = format!("{} {}", url, resp.status());
         if config.codes.contains(&resp_code) {
-            bar_output(out_msg.clone(), 1, &config.verbosity, bar);
+            bar_output(out_msg.clone(), 0, &config.verbosity, bar);
         //if config.outfile.is_some() {
         //    writeln!(config.outfile.unwrap(), "{}", out_msg);
         //}
         } else {
-            bar_output(out_msg, 3, &config.verbosity, bar);
+            bar_output(out_msg, 2, &config.verbosity, bar);
         }
         bar.inc(1);
     }

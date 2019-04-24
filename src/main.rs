@@ -22,7 +22,7 @@ use std::sync::Arc;
 use std::{fs, fs::File, fs::OpenOptions, path::Path, thread, time::Duration};
 
 fn main() {
-    let app_ver = "0.1.2";
+    let app_ver = "0.1.3";
     let app_name = "RustBuster";
 
     let args = App::new(app_name)
@@ -111,7 +111,7 @@ fn main() {
             Arg::with_name("Ignore HTTPS Certificate Errors")
                 .short("U")
                 .long("unsafe-https")
-                .help("Set this option to ignore invalid hostnames and certificate errors")
+                .help("Ignore invalid hostnames and certificate errors")
                 .multiple(false)
                 .takes_value(false)
                 .required(false)
@@ -135,7 +135,7 @@ fn main() {
             Arg::with_name("basic auth")
                 .short("b")
                 .long("basic-auth")
-                .help("set credentials for http basic authentication in the format username:password")
+                .help("Set credentials for http basic authentication in the format username:password")
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
@@ -147,7 +147,7 @@ fn main() {
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
-                //to be implemented
+                //TO BE IMPLEMENTED
 //            ).arg(
 //            Arg::with_name("Output File")
 //                .short("o")
@@ -203,10 +203,7 @@ fn main() {
     let ext_str = args.value_of("Extensions").unwrap_or("");
 
     //verbosity
-    let verbosity = match args.occurrences_of("Verbosity") {
-        0 => 1,
-        _ => args.occurrences_of("Verbosity"),
-    };
+    let verbosity = args.occurrences_of("Verbosity");
 
     //timeout
     let timeout_input = args
@@ -319,9 +316,6 @@ fn main() {
         t_num = urls.len();
     }
 
-    println!("Will check {} URLs", urls.len());
-    println!("Starting {} threads. \n\n\n", t_num);
-
     //generate vector of number of urls per thread, for splitting targets
     //tries to distribute them as equally as possible
     let mut url_per_thread = Vec::new();
@@ -372,6 +366,8 @@ fn main() {
     let config = Arc::new(config);
 
     //create shared counter
+    //may be used soon
+
     //let progress = Arc::new(AtomicU64::new(0));
     //create bar and put it in Arc
     let bar = ProgressBar::new(urls.len() as u64);
@@ -380,6 +376,13 @@ fn main() {
     );
     bar.tick();
     let bar = Arc::new(bar);
+    let init_msg = format!(
+        "## RustBuster ##\n\nTotal paths to be checked: {}\nThreads: {}\n\n",
+        urls.len(),
+        t_num
+    );
+    bar_output(init_msg, 0, &config.verbosity, &bar);
+
     //vec for storing threads
     let mut threads = Vec::new();
     for i in 0..t_num {

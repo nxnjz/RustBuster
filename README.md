@@ -49,7 +49,7 @@ USAGE:
     rustbuster [FLAGS] [OPTIONS] --url <Base URL> --wordlist <dictionary>
 
 FLAGS:
-    -U, --unsafe-https    Set this option to ignore invalid hostnames and certificate errors
+    -U, --unsafe-https    Ignore invalid hostnames and certificate errors
     -v                    Verbosity level: -v or -vv or -vvv.
     -h, --help            Prints help information
     -V, --version         Prints version information
@@ -78,9 +78,9 @@ OPTIONS:
     -r, --redirect-limit <Redirect Limit>    Set the maximum number of redirects to follow. Default: 0
     -R, --retry-count <Retry Count>          Set the maximum number of tries for a single request (applies in case of
                                              timeouts, or other errors). Default is 0.
-    -T, --timeout <Timeout>...               Total timeout for a request. Default: 30 seconds
+    -T, --timeout <Timeout>...               Total timeout for a request, in seconds. Default: 30 seconds
     -a, --user-agent <User Agent>            Custom User Agent
-    -b, --basic-auth <basic auth>            set credentials for http basic authentication in the format
+    -b, --basic-auth <basic auth>            Set credentials for http basic authentication in the format
                                              username:password
 
 ```
