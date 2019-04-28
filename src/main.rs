@@ -11,6 +11,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with RustBuster. If not, see <http://www.gnu.org/licenses/>. */
 
+//TO DO: do not save results to string unless user wants to output to file.
+
 mod rblib;
 
 use base64::encode as b64;
@@ -18,11 +20,11 @@ use clap::{App, Arg};
 use indicatif::{ProgressBar, ProgressStyle};
 use rblib::*;
 use reqwest::header;
-use std::sync::Arc;
-use std::{fs, fs::File, fs::OpenOptions, path::Path, thread, time::Duration};
+use std::sync::{Arc, Mutex};
+use std::{fs, fs::File, fs::OpenOptions, io::Write, path::Path, thread, time::Duration};
 
 fn main() {
-    let app_ver = "0.1.3";
+    let app_ver = "0.1.4";
     let app_name = "RustBuster";
 
     let args = App::new(app_name)
@@ -147,35 +149,47 @@ fn main() {
                 .multiple(false)
                 .takes_value(true)
                 .required(false)
-                //TO BE IMPLEMENTED
-//            ).arg(
-//            Arg::with_name("Output File")
-//                .short("o")
-//                .long("output-file")
-//                .help("Write results to a file. Only positive results will be saved, regardless of verbosity level.\nIf the file already exits, RustBuster will exit.\nUse -oo to allow overwriting an existing file.")
-//                .multiple(true)
-//                .takes_value(true)
-//                .required(false)
+            ).arg(
+            Arg::with_name("Output File")
+                .short("o")
+                .long("output-file")
+                .help("Write results to a file. Only positive results will be saved, regardless of verbosity level.\nIf the file already exits, RustBuster will exit.\nUse -O to allow overwriting an existing file.")
+                .multiple(false)
+                .takes_value(true)
+                .required(false)
+            ).arg(
+            Arg::with_name("Overwrite Output File")
+                .short("O")
+                .long("overwrite")
+                .help("Allow overwriting the specified output file")
+                .multiple(false)
+                .takes_value(false)
+                .required(false)
             )
         .get_matches();
 
     //check output file
-    //let out_filename = args.value_of("Output File");
-    //if out_filename.is_some()
-    //    && Path::new(out_filename.unwrap()).exists()
-    //    && args.occurrences_of("Output File") != 2
-    //{
-    //    panic!("Output File already exists. Use -oo instead of -o if you want it overwritten");
-    //}
-    //let mut outfile: Option<File> = None;
-    //if out_filename.is_some() {
-    //    outfile = Some(
-    //        OpenOptions::new()
-    //            .append(true)
-    //            .open(out_filename.unwrap())
-    //            .expect("Unable to open file for writing"),
-    //    );
-    //}
+    let out_filename = args.value_of("Output File");
+    if out_filename.is_some()
+        && Path::new(out_filename.unwrap()).exists()
+        && args.occurrences_of("Overwrite Output File") == 0
+    {
+        println!("Use the -O flag to allow overwriting. Exiting...");
+        panic!("Output File already exists.");
+    }
+    let mut outfile: Option<File> = None;
+    if out_filename.is_some() {
+        outfile = Some(
+            OpenOptions::new()
+                .write(true)
+                .create(true)
+                .open(out_filename.unwrap())
+                .expect("Unable to open file for writing"),
+        );
+    }
+
+    //create string for writing to file later
+    let found_urls = String::new();
 
     //base url
     let mut base_url = args.value_of("Base URL").unwrap().to_string();
@@ -385,15 +399,18 @@ fn main() {
 
     //vec for storing threads
     let mut threads = Vec::new();
+    //string to which threads will add found results, for saving to file later.
+    let mut found_urls = Arc::new(Mutex::new(found_urls));
     for i in 0..t_num {
         let url_map_i = url_map[i as usize].clone();
         //clone pointers
         let config = Arc::clone(&config);
         let headers = Arc::clone(&headers);
         let bar = Arc::clone(&bar);
+        let found_urls = Arc::clone(&mut found_urls);
         //spawn threads
         threads.push(thread::spawn(move || {
-            tjob(i, &url_map_i, &config, &headers, &bar);
+            tjob(i, &url_map_i, &config, &headers, &bar, &found_urls);
         }));
     }
 
@@ -401,4 +418,10 @@ fn main() {
     for t in threads {
         let _ = t.join();
     }
+    if let Some(mut x) = outfile {
+        //to fix: handle possible error result
+        x.write_all(found_urls.lock().unwrap().as_bytes());
+    }
+    bar.finish();
+    println!("Done!\n");
 }

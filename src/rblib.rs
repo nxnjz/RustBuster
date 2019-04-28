@@ -13,8 +13,6 @@ along with RustBuster. If not, see <http://www.gnu.org/licenses/>. */
 
 use indicatif::ProgressBar;
 use reqwest::{header, Client, RedirectPolicy};
-use std::fs::File;
-use std::io::Write;
 use std::time::Duration;
 
 pub struct Config {
@@ -53,10 +51,9 @@ pub fn tjob(
     config: &Config,
     headers: &header::HeaderMap,
     bar: &ProgressBar,
+    found_urls: &std::sync::Arc<std::sync::Mutex<std::string::String>>,
 ) {
     bar_output(format!("Thread {} started", i), 3, &config.verbosity, bar);
-    //let mut proxy_u = "";
-    //let mut proxy_p = "";
     #[allow(unused_assignments)]
     let mut proxy_url = String::new();
     let mut clientbuild = Client::builder();
@@ -142,9 +139,10 @@ pub fn tjob(
         let out_msg = format!("{} {}", url, resp.status());
         if config.codes.contains(&resp_code) {
             bar_output(out_msg.clone(), 0, &config.verbosity, bar);
-        //if config.outfile.is_some() {
-        //    writeln!(config.outfile.unwrap(), "{}", out_msg);
-        //}
+            {
+                let mut found_urls = found_urls.lock().unwrap();
+                found_urls.push_str(&(out_msg + "\n"));
+            }
         } else {
             bar_output(out_msg, 2, &config.verbosity, bar);
         }
