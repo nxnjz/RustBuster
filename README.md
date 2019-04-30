@@ -1,3 +1,7 @@
+The main RustBuster repository is at https://gitlab.com/nxnjz/RustBuster, use it instead, as this github repo is out of date.
+
+
+
 # RustBuster
 
 RustBuster is a simple multithreaded CLI tool for bruteforcing files and/or directories on HTTP(s) servers, similar to GoBuster, DirBuster, and Dirb.
